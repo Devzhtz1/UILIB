@@ -1,13 +1,13 @@
 --[[
     ╔═══════════════════════════════════════════════════════════════════╗
-    ║                      FLUID UI LIBRARY                               ║
-    ║                    Version 2.0.0                                   ║
+    ║                     AURORA UI LIBRARY                              ║
+    ║                    Version 1.0.0                                   ║
     ╠═══════════════════════════════════════════════════════════════════╣
-    ║  GitHub: https://github.com/Devzhtz1/UILIB                         ║
+    ║  GitHub: https://github.com/Devzhtz1/UILIB                        ║
     ║  Author: Devzhtz1                                                  ║
     ╚═══════════════════════════════════════════════════════════════════╝
     
-    Uma biblioteca de UI minimalista e suave para Roblox
+    Uma biblioteca de UI moderna e completa para Roblox
     
     Features:
     - Sistema de temas editáveis (8 temas predefinidos)
@@ -92,7 +92,7 @@ local CoreGui = cloneref(game:GetService("CoreGui"))
 
 local ScreenGui = _Instancenew('ScreenGui')
 ProtectGui(ScreenGui)
-ScreenGui.Name = "FluidUILib"
+ScreenGui.Name = "AuroraUILib"
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 ScreenGui.DisplayOrder = 999999999
 ScreenGui.ResetOnSpawn = false
@@ -232,19 +232,6 @@ local Themes = {
 		OutlineColor = _Color3FromRGB(200, 200, 200),
 		RiskColor = _Color3FromRGB(239, 68, 68),
 	},
-	-- Fluid: tema baseado na logo - suave e minimalista
-	Fluid = {
-		FontColor = _Color3FromRGB(230, 230, 240),
-		MainColor = _Color3FromRGB(18, 18, 24),
-		BackgroundColor = _Color3FromRGB(12, 12, 18),
-		AccentColor = _Color3FromRGB(147, 165, 255),
-		OutlineColor = _Color3FromRGB(35, 35, 45),
-		RiskColor = _Color3FromRGB(255, 120, 150),
-		SeparatorColor = _Color3FromRGB(40, 40, 50),
-		HoverColor = _Color3FromRGB(25, 25, 32),
-		SelectedColor = _Color3FromRGB(30, 30, 40),
-		AccentColorSecondary = _Color3FromRGB(180, 150, 255),
-	},
 }
 
 --[[ ========================================
@@ -261,17 +248,16 @@ local Library = {
 	Toggled = true,
 	ToggleKey = Enum.KeyCode.RightControl,
 	
-	-- Cores (tema padrão: Fluid)
-	FontColor = Themes.Fluid.FontColor,
-	MainColor = Themes.Fluid.MainColor,
-	BackgroundColor = Themes.Fluid.BackgroundColor,
-	AccentColor = Themes.Fluid.AccentColor,
-	OutlineColor = Themes.Fluid.OutlineColor,
-	RiskColor = Themes.Fluid.RiskColor,
-	SeparatorColor = Themes.Fluid.SeparatorColor or _Color3FromRGB(40, 40, 50),
-	HoverColor = Themes.Fluid.HoverColor or _Color3FromRGB(25, 25, 32),
-	SelectedColor = Themes.Fluid.SelectedColor or _Color3FromRGB(30, 30, 40),
-	AccentColorSecondary = Themes.Fluid.AccentColorSecondary or _Color3FromRGB(180, 150, 255),
+	-- Cores (tema padrão: Vizor)
+	FontColor = Themes.Default.FontColor,
+	MainColor = Themes.Default.MainColor,
+	BackgroundColor = Themes.Default.BackgroundColor,
+	AccentColor = Themes.Default.AccentColor,
+	OutlineColor = Themes.Default.OutlineColor,
+	RiskColor = Themes.Default.RiskColor,
+	SeparatorColor = Themes.Default.SeparatorColor or _Color3FromRGB(60, 60, 60),
+	HoverColor = Themes.Default.HoverColor or _Color3FromRGB(40, 40, 40),
+	SelectedColor = Themes.Default.SelectedColor or _Color3FromRGB(35, 35, 35),
 	Black = _Color3New(0, 0, 0),
 	
 	-- Fonte moderna (Vizor style)
@@ -293,7 +279,7 @@ local Library = {
 	
 	-- Temas disponíveis
 	Themes = Themes,
-	CurrentTheme = "Fluid",
+	CurrentTheme = "Default",
 	
 	-- Globals
 	Toggles = Toggles,
@@ -343,10 +329,6 @@ function Library:SetTheme(themeName)
 	Library.AccentColor = theme.AccentColor
 	Library.OutlineColor = theme.OutlineColor
 	Library.RiskColor = theme.RiskColor
-	Library.SeparatorColor = theme.SeparatorColor or Library.SeparatorColor
-	Library.HoverColor = theme.HoverColor or Library.HoverColor
-	Library.SelectedColor = theme.SelectedColor or Library.SelectedColor
-	Library.AccentColorSecondary = theme.AccentColorSecondary or Library.AccentColorSecondary
 	
 	Library:ComputeDerivedColors()
 	Library:UpdateColorsUsingRegistry()

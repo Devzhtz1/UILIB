@@ -13,19 +13,8 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 	local _Vector2New = Vector2.new
 	local _Color3New = Color3.new
 	local _Color3FromRGB = Color3.fromRGB
-	local _ColorSequenceNew = ColorSequence.new
-	local _ColorSequenceKeypointNew = ColorSequenceKeypoint.new
-	local _Color3ToHSV = Color3.toHSV
-	local _Color3FromHSV = Color3.fromHSV
-	local _MathClamp = math.clamp
 	local _TableInsert = table.insert
 	local _Type = type
-	
-	-- Função auxiliar para escurecer cores
-	local function GetDarkerColor(Color)
-		local H, S, V = _Color3ToHSV(Color)
-		return _Color3FromHSV(H, S, V / 2.5)
-	end
 	
 	local UserInputService = game:GetService("UserInputService")
 	local RunService = game:GetService("RunService")
@@ -64,7 +53,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 			TabButtons = {},
 		}
 		
-		-- Window minimalista com cantos arredondados suaves
+		-- Window no estilo Vizor (sem cantos arredondados, bordas sutis)
 		local Outer = Library:Create('Frame', {
 			AnchorPoint = Config.AnchorPoint,
 			BackgroundColor3 = Library.MainColor,
@@ -77,26 +66,11 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 		})
 		Window.MainFrame = Outer
 		
-		Library:Create('UICorner', {
-			CornerRadius = _UDimNew(0, 8),
-			Parent = Outer,
-		})
-		
-		-- Gradiente suave na janela
-		local WindowGradient = Library:Create('UIGradient', {
-			Color = _ColorSequenceNew({
-				_ColorSequenceKeypointNew(0, Library.MainColor),
-				_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
-			}),
-			Rotation = 90,
-			Parent = Outer,
-		})
-		
-		-- Borda suave
+		-- Borda sutil estilo Vizor
 		local OuterStroke = Library:Create('UIStroke', {
 			Color = Library.OutlineColor,
-			Thickness = 1.5,
-			Transparency = 0.6,
+			Thickness = 1,
+			Transparency = 0.2,
 			Parent = Outer,
 		})
 		Library:AddToRegistry(OuterStroke, { Color = 'OutlineColor' })
@@ -202,7 +176,8 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 			Position = _UDim2New(0, 0, 0, 0),
 			Size = _UDim2New(1, 0, 0, 30),
 			ZIndex = 1,
-			ClipsDescendants = true,
+			ClipsDescendants = false,
+			Visible = true,
 			Parent = MainSectionInner,
 		})
 		
@@ -274,7 +249,10 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 			tabWidth = math.max(80, tabWidth)
 			
 			for i, v in next, Window.TabButtons do
-				v.Size = _UDim2New(0, tabWidth, 0, 30)
+				if v and v.Parent then
+					v.Size = _UDim2New(0, tabWidth, 0, 30)
+					v.Visible = true
+				end
 			end
 		end
 		
@@ -319,7 +297,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 				Tabboxes = {},
 			}
 			
-			-- Tab button minimalista com gradiente suave
+			-- Tab button estilo Vizor (sem cantos arredondados)
 			local TabButton = Library:Create('TextButton', {
 				BackgroundColor3 = Library.MainColor,
 				BackgroundTransparency = 0,
@@ -328,25 +306,18 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 				AutoButtonColor = false,
 				Text = '',
 				ZIndex = 2,
+				Visible = true,
 				Parent = TabArea,
-			})
-			
-			-- Gradiente suave no tab button
-			local TabGradient = Library:Create('UIGradient', {
-				Color = _ColorSequenceNew({
-					_ColorSequenceKeypointNew(0, Library.MainColor),
-					_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
-				}),
-				Rotation = 90,
-				Parent = TabButton,
 			})
 			
 			_TableInsert(Window.TabButtons, TabButton)
 			
-			-- Recalcular tamanho das tabs imediatamente e depois
+			-- Recalcular tamanho das tabs imediatamente
 			RecalculateTabSizes()
+			
+			-- Recalcular novamente após um frame para garantir
 			task.spawn(function()
-				task.wait(0.1)
+				task.wait()
 				RecalculateTabSizes()
 			end)
 			
@@ -386,55 +357,36 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 				Parent = TabContent,
 			})
 			
-			-- Indicador de tab ativa com gradiente suave
+			-- Indicador de tab ativa (background highlight estilo Vizor)
 			local TabIndicator = Library:Create('Frame', {
-				BackgroundColor3 = Library.AccentColor,
+				BackgroundColor3 = Library.SelectedColor or Library.HoverColor,
 				BorderSizePixel = 0,
-				Position = _UDim2New(0, 0, 1, -2),
-				Size = _UDim2New(1, 0, 0, 2),
+				Position = _UDim2New(0, 0, 0, 0),
+				Size = _UDim2New(1, 0, 1, 0),
 				Visible = false,
 				ZIndex = 1,
 				Parent = TabButton,
 			})
+			Library:AddToRegistry(TabIndicator, { BackgroundColor3 = 'SelectedColor' })
 			
-			local IndicatorGradient = Library:Create('UIGradient', {
-				Color = _ColorSequenceNew({
-					_ColorSequenceKeypointNew(0, Library.AccentColor),
-					_ColorSequenceKeypointNew(1, Library.AccentColorSecondary or Library.AccentColor),
-				}),
-				Rotation = 0,
-				Parent = TabIndicator,
-			})
-			Library:AddToRegistry(TabIndicator, { BackgroundColor3 = 'AccentColor' })
-			
-			-- Animações suaves com Spring para hover
+			-- Animações com Spring para hover
 			local tabHoverSpring = Library.Spring.new(0)
 			local tabHoverConnection = RunService.RenderStepped:Connect(function()
 				local alpha = tabHoverSpring.Position
 				if not TabIndicator.Visible then
-					local baseR, baseG, baseB = Library.MainColor.R, Library.MainColor.G, Library.MainColor.B
-					local hoverR, hoverG, hoverB = Library.HoverColor.R, Library.HoverColor.G, Library.HoverColor.B
-					
-					TabGradient.Color = _ColorSequenceNew({
-						_ColorSequenceKeypointNew(0, Color3.new(
-							baseR + (hoverR - baseR) * alpha,
-							baseG + (hoverG - baseG) * alpha,
-							baseB + (hoverB - baseB) * alpha
-						)),
-						_ColorSequenceKeypointNew(1, GetDarkerColor(Color3.new(
-							baseR + (hoverR - baseR) * alpha,
-							baseG + (hoverG - baseG) * alpha,
-							baseB + (hoverB - baseB) * alpha
-						))),
-					})
+					TabButton.BackgroundColor3 = Color3.new(
+						0.117 + alpha * 0.02,
+						0.117 + alpha * 0.02,
+						0.117 + alpha * 0.02
+					)
 				end
 			end)
 			
 			TabButton.MouseEnter:Connect(function()
 				if not TabIndicator.Visible then
 					tabHoverSpring.Target = 1
-					tabHoverSpring.Speed = 25
-					tabHoverSpring.Damper = 0.8
+					tabHoverSpring.Speed = 20
+					tabHoverSpring.Damper = 0.7
 				end
 			end)
 			TabButton.MouseLeave:Connect(function()
@@ -508,29 +460,19 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 					T:HideTab()
 				end
 				
-				-- Mostrar indicador e estilizar tab ativa com animação suave
+				-- Mostrar indicador e estilizar tab ativa
 				TabIndicator.Visible = true
+				TabButton.BackgroundTransparency = 0.8
 				TabButtonLabel.TextColor3 = Library.AccentColor
 				TabFrame.Visible = true
-				
-				-- Atualizar gradiente da tab ativa
-				TabGradient.Color = _ColorSequenceNew({
-					_ColorSequenceKeypointNew(0, Library.HoverColor),
-					_ColorSequenceKeypointNew(1, GetDarkerColor(Library.HoverColor)),
-				})
 			end
 			
 			function Tab:HideTab()
 				-- Esconder indicador
 				TabIndicator.Visible = false
+				TabButton.BackgroundTransparency = 1
 				TabButtonLabel.TextColor3 = Library.FontColor
 				TabFrame.Visible = false
-				
-				-- Restaurar gradiente padrão
-				TabGradient.Color = _ColorSequenceNew({
-					_ColorSequenceKeypointNew(0, Library.MainColor),
-					_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
-				})
 			end
 			
 			function Tab:SetLayoutOrder(Position)
@@ -544,7 +486,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 			function Tab:AddGroupbox(Info)
 				local Groupbox = {}
 				
-				-- Groupbox minimalista com gradiente suave
+				-- Groupbox estilo Vizor (sem cantos arredondados)
 				local BoxOuter = Library:Create('Frame', {
 					BackgroundColor3 = Library.MainColor,
 					BorderSizePixel = 0,
@@ -553,29 +495,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 					ZIndex = 2,
 					Parent = Info.Side == 1 and LeftSide or RightSide,
 				})
-				
-				Library:Create('UICorner', {
-					CornerRadius = _UDimNew(0, 6),
-					Parent = BoxOuter,
-				})
-				
-				local BoxGradient = Library:Create('UIGradient', {
-					Color = _ColorSequenceNew({
-						_ColorSequenceKeypointNew(0, Library.MainColor),
-						_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
-					}),
-					Rotation = 90,
-					Parent = BoxOuter,
-				})
-				
-				local BoxStroke = Library:Create('UIStroke', {
-					Color = Library.OutlineColor,
-					Thickness = 1,
-					Transparency = 0.8,
-					Parent = BoxOuter,
-				})
 				Library:AddToRegistry(BoxOuter, { BackgroundColor3 = 'MainColor' })
-				Library:AddToRegistry(BoxStroke, { Color = 'OutlineColor' })
 				
 				local BoxInner = Library:Create('Frame', {
 					BackgroundTransparency = 1,

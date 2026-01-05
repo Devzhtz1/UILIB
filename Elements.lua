@@ -158,35 +158,25 @@ function Elements:Init(Library, Toggles, Options, ScreenGui, BaseAddons)
 		local Container = Groupbox.Container
 		
 		local function CreateBaseButton(Btn)
-			-- Botão minimalista com gradiente suave
+			-- Botão moderno com cantos arredondados e contorno visível
 			local Outer = Library:Create('TextButton', {
 				BackgroundColor3 = Library.MainColor,
 				BorderSizePixel = 0,
-				Size = _UDim2New(1, 0, 0, 32),
+				Size = _UDim2New(1, 0, 0, 28),
 				AutoButtonColor = false,
 				Text = '',
 				ZIndex = 5,
 			})
 			Library:Create('UICorner', {
-				CornerRadius = _UDimNew(0, 8),
+				CornerRadius = _UDimNew(0, 4),
 				Parent = Outer,
 			})
 			
-			-- Gradiente suave no botão
-			local ButtonGradient = Library:Create('UIGradient', {
-				Color = _ColorSequenceNew({
-					_ColorSequenceKeypointNew(0, Library.MainColor),
-					_ColorSequenceKeypointNew(1, Library:GetDarkerColor(Library.MainColor)),
-				}),
-				Rotation = 90,
-				Parent = Outer,
-			})
-			
-			-- Contorno suave
+			-- Contorno visível sempre
 			local OuterStroke = Library:Create('UIStroke', {
 				Color = Library.OutlineColor,
-				Thickness = 1.5,
-				Transparency = 0.6,
+				Thickness = 1,
+				Transparency = 0,
 				Parent = Outer,
 			})
 			
@@ -202,45 +192,27 @@ function Elements:Init(Library, Toggles, Options, ScreenGui, BaseAddons)
 			Library:AddToRegistry(Outer, { BackgroundColor3 = 'MainColor' })
 			Library:AddToRegistry(OuterStroke, { Color = 'OutlineColor' })
 			
-			-- Hover effect suave com gradiente animado
+			-- Hover effect com animação Spring
 			local buttonHoverSpring = Library.Spring.new(0)
 			local buttonHoverConnection = RunService.RenderStepped:Connect(function()
 				local alpha = buttonHoverSpring.Position
-				
-				-- Interpolar cor do stroke
 				OuterStroke.Color = Color3.new(
-					Library.OutlineColor.R + (Library.AccentColor.R - Library.OutlineColor.R) * alpha * 0.8,
-					Library.OutlineColor.G + (Library.AccentColor.G - Library.OutlineColor.G) * alpha * 0.8,
-					Library.OutlineColor.B + (Library.AccentColor.B - Library.OutlineColor.B) * alpha * 0.8
+					Library.OutlineColor.R + (Library.AccentColor.R - Library.OutlineColor.R) * alpha,
+					Library.OutlineColor.G + (Library.AccentColor.G - Library.OutlineColor.G) * alpha,
+					Library.OutlineColor.B + (Library.AccentColor.B - Library.OutlineColor.B) * alpha
 				)
-				OuterStroke.Transparency = 0.6 - (alpha * 0.4)
-				OuterStroke.Thickness = 1.5 + (alpha * 0.5)
-				
-				-- Interpolar gradiente
-				local accentR, accentG, accentB = Library.AccentColor.R, Library.AccentColor.G, Library.AccentColor.B
-				local mainR, mainG, mainB = Library.MainColor.R, Library.MainColor.G, Library.MainColor.B
-				local darkerR, darkerG, darkerB = Library:GetDarkerColor(Library.MainColor).R, 
-					Library:GetDarkerColor(Library.MainColor).G, 
-					Library:GetDarkerColor(Library.MainColor).B
-				
-				ButtonGradient.Color = _ColorSequenceNew({
-					_ColorSequenceKeypointNew(0, Color3.new(
-						mainR + (accentR - mainR) * alpha * 0.3,
-						mainG + (accentG - mainG) * alpha * 0.3,
-						mainB + (accentB - mainB) * alpha * 0.3
-					)),
-					_ColorSequenceKeypointNew(1, Color3.new(
-						darkerR + (accentR - darkerR) * alpha * 0.2,
-						darkerG + (accentG - darkerG) * alpha * 0.2,
-						darkerB + (accentB - darkerB) * alpha * 0.2
-					)),
-				})
+				local lighter = Library:GetLighterColor(Library.MainColor)
+				Outer.BackgroundColor3 = Color3.new(
+					Library.MainColor.R + (lighter.R - Library.MainColor.R) * alpha,
+					Library.MainColor.G + (lighter.G - Library.MainColor.G) * alpha,
+					Library.MainColor.B + (lighter.B - Library.MainColor.B) * alpha
+				)
 			end)
 			
 			Outer.MouseEnter:Connect(function()
 				buttonHoverSpring.Target = 1
-				buttonHoverSpring.Speed = 25
-				buttonHoverSpring.Damper = 0.8
+				buttonHoverSpring.Speed = 20
+				buttonHoverSpring.Damper = 0.7
 			end)
 			Outer.MouseLeave:Connect(function()
 				buttonHoverSpring.Target = 0
@@ -444,116 +416,59 @@ function Elements:Init(Library, Toggles, Options, ScreenGui, BaseAddons)
 			end
 		end
 		
-		-- Switch minimalista com gradiente suave
+		-- Switch minimalista e suave (32x18)
 		local SwitchOuter = Library:Create('Frame', {
-			BackgroundColor3 = _Color3FromRGB(40, 40, 50),
+			BackgroundColor3 = _Color3FromRGB(50, 50, 50),
 			BorderSizePixel = 0,
-			Size = _UDim2New(0, 44, 0, 24),
-			Position = _UDim2New(1, -44, 0.5, -12),
+			Size = _UDim2New(0, 32, 0, 18),
+			Position = _UDim2New(1, -32, 0.5, -9),
 			ZIndex = 6,
 			Parent = ToggleFrame,
 		})
 		Library:Create('UICorner', {
-			CornerRadius = _UDimNew(0, 12),
+			CornerRadius = _UDimNew(0, 9),
 			Parent = SwitchOuter,
 		})
-		
-		-- Gradiente suave no switch
-		local SwitchGradient = Library:Create('UIGradient', {
-			Color = _ColorSequenceNew({
-				_ColorSequenceKeypointNew(0, _Color3FromRGB(40, 40, 50)),
-				_ColorSequenceKeypointNew(1, _Color3FromRGB(35, 35, 45)),
-			}),
-			Rotation = 90,
-			Parent = SwitchOuter,
-		})
-		
 		local SwitchStroke = Library:Create('UIStroke', {
 			Color = Library.OutlineColor,
-			Thickness = 1.5,
-			Transparency = 0.7,
+			Thickness = 1,
+			Transparency = 0.5,
 			Parent = SwitchOuter,
 		})
 		
-		-- Knob do switch com sombra suave
+		-- Knob do switch (bolinha menor) - 12px
 		local SwitchKnob = Library:Create('Frame', {
-			BackgroundColor3 = _Color3New(1, 1, 1),
+			BackgroundColor3 = _Color3FromRGB(180, 180, 180),
 			BorderSizePixel = 0,
-			Size = _UDim2New(0, 18, 0, 18),
-			Position = _UDim2New(0, 3, 0.5, -9),
-			ZIndex = 8,
+			Size = _UDim2New(0, 12, 0, 12),
+			Position = _UDim2New(0, 3, 0.5, -6),
+			ZIndex = 7,
 			Parent = SwitchOuter,
 		})
 		Library:Create('UICorner', {
-			CornerRadius = _UDimNew(0, 9),
+			CornerRadius = _UDimNew(0, 6),
 			Parent = SwitchKnob,
 		})
 		
-		-- Sombra suave no knob
-		local KnobShadow = Library:Create('UIStroke', {
-			Color = _Color3New(0, 0, 0),
-			Thickness = 1,
-			Transparency = 0.6,
-			Parent = SwitchKnob,
-		})
-		
-		-- Gradiente no knob quando ativado
-		local KnobGradient = Library:Create('UIGradient', {
-			Color = _ColorSequenceNew({
-				_ColorSequenceKeypointNew(0, _Color3New(1, 1, 1)),
-				_ColorSequenceKeypointNew(1, _Color3FromRGB(240, 240, 250)),
-			}),
-			Rotation = 135,
-			Parent = SwitchKnob,
-		})
-		
-		-- Animações suaves com Spring
+		-- Animações com Spring para o switch (apenas posição do knob)
 		local switchSpring = Library.Spring.new(Toggle.Value and 1 or 0)
-		local switchColorSpring = Library.Spring.new(Toggle.Value and 1 or 0)
 		local switchConnection = RunService.RenderStepped:Connect(function()
 			local value = switchSpring.Position
-			local colorValue = switchColorSpring.Position
-			
-			-- Interpolar posição do knob (de 3px a 23px)
-			local knobX = 3 + (value * 23)
-			SwitchKnob.Position = _UDim2New(0, knobX, 0.5, -9)
-			
-			-- Interpolar cor do switch com gradiente suave
-			local accentR, accentG, accentB = Library.AccentColor.R, Library.AccentColor.G, Library.AccentColor.B
-			local accent2R, accent2G, accent2B = (Library.AccentColorSecondary and Library.AccentColorSecondary.R or accentR), 
-				(Library.AccentColorSecondary and Library.AccentColorSecondary.G or accentG),
-				(Library.AccentColorSecondary and Library.AccentColorSecondary.B or accentB)
-			local baseR, baseG, baseB = 0.15, 0.15, 0.18
-			
-			SwitchGradient.Color = _ColorSequenceNew({
-				_ColorSequenceKeypointNew(0, Color3.new(
-					baseR + (accentR - baseR) * colorValue * 0.6,
-					baseG + (accentG - baseG) * colorValue * 0.6,
-					baseB + (accentB - baseB) * colorValue * 0.6
-				)),
-				_ColorSequenceKeypointNew(1, Color3.new(
-					baseR + (accent2R - baseR) * colorValue * 0.4,
-					baseG + (accent2G - baseG) * colorValue * 0.4,
-					baseB + (accent2B - baseB) * colorValue * 0.4
-				)),
-			})
-			
-			-- Escala suave do knob
-			local scale = 0.95 + (colorValue * 0.05)
-			SwitchKnob.Size = _UDim2New(0, 18 * scale, 0, 18 * scale)
+			-- Interpolar posição do knob (de 3px a 17px)
+			local knobX = 3 + (value * 14)
+			SwitchKnob.Position = _UDim2New(0, knobX, 0.5, -6)
 		end)
 		
-		-- Hover effect suave
+		-- Hover effect suave apenas na transparência do stroke
 		local switchHoverSpring = Library.Spring.new(0)
 		local switchHoverConnection = RunService.RenderStepped:Connect(function()
 			local alpha = switchHoverSpring.Position
-			SwitchStroke.Transparency = 0.7 - (alpha * 0.5)
-			SwitchStroke.Thickness = 1.5 + (alpha * 0.5)
+			SwitchStroke.Transparency = 0.5 - (alpha * 0.2)
 		end)
 		
 		SwitchOuter.MouseEnter:Connect(function()
 			switchHoverSpring.Target = 1
-			switchHoverSpring.Speed = 25
+			switchHoverSpring.Speed = 15
 			switchHoverSpring.Damper = 0.8
 		end)
 		SwitchOuter.MouseLeave:Connect(function()
@@ -567,19 +482,19 @@ function Elements:Init(Library, Toggles, Options, ScreenGui, BaseAddons)
 		-- Função Display com animação Spring suave
 		function Toggle:Display()
 			if Toggle.Value then
+				-- Ativado: cor accent, knob à direita
 				switchSpring.Target = 1
-				switchColorSpring.Target = 1
-				switchSpring.Speed = 30
-				switchSpring.Damper = 0.85
-				switchColorSpring.Speed = 25
-				switchColorSpring.Damper = 0.8
+				switchSpring.Speed = 20
+				switchSpring.Damper = 0.8
+				SwitchOuter.BackgroundColor3 = Library.AccentColor
+				SwitchKnob.BackgroundColor3 = _Color3FromRGB(25, 25, 25)
 			else
+				-- Desativado: cor escura, knob à esquerda
 				switchSpring.Target = 0
-				switchColorSpring.Target = 0
-				switchSpring.Speed = 30
-				switchSpring.Damper = 0.85
-				switchColorSpring.Speed = 25
-				switchColorSpring.Damper = 0.8
+				switchSpring.Speed = 20
+				switchSpring.Damper = 0.8
+				SwitchOuter.BackgroundColor3 = _Color3FromRGB(50, 50, 50)
+				SwitchKnob.BackgroundColor3 = _Color3FromRGB(180, 180, 180)
 			end
 		end
 		
@@ -703,38 +618,28 @@ function Elements:Init(Library, Toggles, Options, ScreenGui, BaseAddons)
 			})
 		end
 		
-		-- Track do slider com gradiente suave
+		-- Track do slider (background) - mais grosso e visível
 		local SliderOuter = Library:Create('Frame', {
-			BackgroundColor3 = _Color3FromRGB(35, 35, 45),
+			BackgroundColor3 = _Color3FromRGB(40, 40, 40),
 			BorderSizePixel = 0,
-			Size = _UDim2New(1, 0, 0, 6),
-			Position = _UDim2New(0, 0, 1, -10),
+			Size = _UDim2New(1, 0, 0, 8),
+			Position = _UDim2New(0, 0, 1, -12),
 			ZIndex = 5,
 			Parent = SliderFrame,
 		})
 		Library:Create('UICorner', {
-			CornerRadius = _UDimNew(0, 3),
+			CornerRadius = _UDimNew(0, 4),
 			Parent = SliderOuter,
 		})
-		
-		local TrackGradient = Library:Create('UIGradient', {
-			Color = _ColorSequenceNew({
-				_ColorSequenceKeypointNew(0, _Color3FromRGB(35, 35, 45)),
-				_ColorSequenceKeypointNew(1, _Color3FromRGB(30, 30, 40)),
-			}),
-			Rotation = 90,
-			Parent = SliderOuter,
-		})
-		
 		local SliderStroke = Library:Create('UIStroke', {
 			Color = Library.OutlineColor,
 			Thickness = 1,
-			Transparency = 0.7,
+			Transparency = 0.5,
 			Parent = SliderOuter,
 		})
 		Library:AddToRegistry(SliderStroke, { Color = 'OutlineColor' })
 		
-		-- Fill do slider com gradiente suave
+		-- Fill do slider (progresso)
 		local Fill = Library:Create('Frame', {
 			BackgroundColor3 = Library.AccentColor,
 			BorderSizePixel = 0,
@@ -743,51 +648,31 @@ function Elements:Init(Library, Toggles, Options, ScreenGui, BaseAddons)
 			Parent = SliderOuter,
 		})
 		Library:Create('UICorner', {
-			CornerRadius = _UDimNew(0, 3),
-			Parent = Fill,
-		})
-		
-		local FillGradient = Library:Create('UIGradient', {
-			Color = _ColorSequenceNew({
-				_ColorSequenceKeypointNew(0, Library.AccentColor),
-				_ColorSequenceKeypointNew(1, Library.AccentColorSecondary or Library.AccentColor),
-			}),
-			Rotation = 90,
+			CornerRadius = _UDimNew(0, 4),
 			Parent = Fill,
 		})
 		Library:AddToRegistry(Fill, { BackgroundColor3 = 'AccentColor' })
 		
-		-- Knob do slider com sombra suave
+		-- Knob do slider (bolinha) - parented ao SliderOuter para posição correta
 		local Knob = Library:Create('Frame', {
 			BackgroundColor3 = _Color3New(1, 1, 1),
 			BorderSizePixel = 0,
-			Size = _UDim2New(0, 18, 0, 18),
-			Position = _UDim2New(0, -9, 0.5, -9),
+			Size = _UDim2New(0, 16, 0, 16),
+			Position = _UDim2New(0, -8, 0.5, -8),
 			ZIndex = 8,
 			Parent = SliderOuter,
 		})
 		Library:Create('UICorner', {
-			CornerRadius = _UDimNew(0, 9),
+			CornerRadius = _UDimNew(0, 8),
 			Parent = Knob,
 		})
-		
-		local KnobGradient = Library:Create('UIGradient', {
-			Color = _ColorSequenceNew({
-				_ColorSequenceKeypointNew(0, _Color3New(1, 1, 1)),
-				_ColorSequenceKeypointNew(1, _Color3FromRGB(240, 240, 250)),
-			}),
-			Rotation = 135,
+		-- Contorno sutil no knob
+		Library:Create('UIStroke', {
+			Color = Library.OutlineColor,
+			Thickness = 1,
+			Transparency = 0.5,
 			Parent = Knob,
 		})
-		
-		-- Contorno suave no knob
-		local KnobStroke = Library:Create('UIStroke', {
-			Color = Library.AccentColor,
-			Thickness = 2,
-			Transparency = 0.4,
-			Parent = Knob,
-		})
-		Library:AddToRegistry(KnobStroke, { Color = 'AccentColor' })
 		
 		-- Display do valor
 		local DisplayLabel = Library:CreateLabel({

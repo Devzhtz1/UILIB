@@ -1,10 +1,10 @@
 --[[
     ╔═══════════════════════════════════════════════════════════════════╗
-    ║                      FLUID UI LIBRARY                              ║
+    ║                     AURORA UI LIBRARY                              ║
     ║                    Complete Usage Example                          ║
     ╠═══════════════════════════════════════════════════════════════════╣
     ║  GitHub: https://github.com/Devzhtz1/UILIB                        ║
-    ║  Version: 2.0.0                                                    ║
+    ║  Version: 1.0.0                                                    ║
     ║  Author: Devzhtz1                                                  ║
     ╚═══════════════════════════════════════════════════════════════════╝
 --]]
@@ -31,7 +31,7 @@ Library.ToggleKey = Enum.KeyCode.RightControl -- Tecla para abrir/fechar
 -- CRIANDO A JANELA PRINCIPAL
 -----------------------------------------------------------------
 local Window = Library:CreateWindow({
-    Title = "Fluid UI Library | by Devzhtz1",
+    Title = "Aurora UI Library | by Devzhtz1",
     Center = true,
     AutoShow = true,
     TabPadding = 2,
@@ -681,13 +681,13 @@ task.spawn(function()
 end)
 
 -- Notificações de carregamento
-Library:Notify("Fluid UI Library carregada com sucesso!", 5)
+Library:Notify("Aurora UI Library carregada com sucesso!", 5)
 Library:Notify("Pressione RightControl para abrir/fechar o menu", 5)
 
 -- Print no console
 print([[
 ╔════════════════════════════════════════════════════════╗
-║           Fluid UI Library Loaded!                     ║
+║           Aurora UI Library Loaded!                    ║
 ╠════════════════════════════════════════════════════════╣
 ║  Toggle Menu: RightControl                             ║
 ║  GitHub: https://github.com/Devzhtz1/UILIB             ║
