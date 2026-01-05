@@ -15,8 +15,17 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 	local _Color3FromRGB = Color3.fromRGB
 	local _ColorSequenceNew = ColorSequence.new
 	local _ColorSequenceKeypointNew = ColorSequenceKeypoint.new
+	local _Color3ToHSV = Color3.toHSV
+	local _Color3FromHSV = Color3.fromHSV
+	local _MathClamp = math.clamp
 	local _TableInsert = table.insert
 	local _Type = type
+	
+	-- Função auxiliar para escurecer cores
+	local function GetDarkerColor(Color)
+		local H, S, V = _Color3ToHSV(Color)
+		return _Color3FromHSV(H, S, V / 2.5)
+	end
 	
 	local UserInputService = game:GetService("UserInputService")
 	local RunService = game:GetService("RunService")
@@ -77,7 +86,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 		local WindowGradient = Library:Create('UIGradient', {
 			Color = _ColorSequenceNew({
 				_ColorSequenceKeypointNew(0, Library.MainColor),
-				_ColorSequenceKeypointNew(1, Library:GetDarkerColor(Library.MainColor)),
+				_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
 			}),
 			Rotation = 90,
 			Parent = Outer,
@@ -326,7 +335,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 			local TabGradient = Library:Create('UIGradient', {
 				Color = _ColorSequenceNew({
 					_ColorSequenceKeypointNew(0, Library.MainColor),
-					_ColorSequenceKeypointNew(1, Library:GetDarkerColor(Library.MainColor)),
+					_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
 				}),
 				Rotation = 90,
 				Parent = TabButton,
@@ -412,7 +421,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 							baseG + (hoverG - baseG) * alpha,
 							baseB + (hoverB - baseB) * alpha
 						)),
-						_ColorSequenceKeypointNew(1, Library:GetDarkerColor(Color3.new(
+						_ColorSequenceKeypointNew(1, GetDarkerColor(Color3.new(
 							baseR + (hoverR - baseR) * alpha,
 							baseG + (hoverG - baseG) * alpha,
 							baseB + (hoverB - baseB) * alpha
@@ -507,7 +516,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 				-- Atualizar gradiente da tab ativa
 				TabGradient.Color = _ColorSequenceNew({
 					_ColorSequenceKeypointNew(0, Library.HoverColor),
-					_ColorSequenceKeypointNew(1, Library:GetDarkerColor(Library.HoverColor)),
+					_ColorSequenceKeypointNew(1, GetDarkerColor(Library.HoverColor)),
 				})
 			end
 			
@@ -520,7 +529,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 				-- Restaurar gradiente padrão
 				TabGradient.Color = _ColorSequenceNew({
 					_ColorSequenceKeypointNew(0, Library.MainColor),
-					_ColorSequenceKeypointNew(1, Library:GetDarkerColor(Library.MainColor)),
+					_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
 				})
 			end
 			
@@ -553,7 +562,7 @@ function Window:Init(Library, Toggles, Options, ScreenGui, BaseGroupbox)
 				local BoxGradient = Library:Create('UIGradient', {
 					Color = _ColorSequenceNew({
 						_ColorSequenceKeypointNew(0, Library.MainColor),
-						_ColorSequenceKeypointNew(1, Library:GetDarkerColor(Library.MainColor)),
+						_ColorSequenceKeypointNew(1, GetDarkerColor(Library.MainColor)),
 					}),
 					Rotation = 90,
 					Parent = BoxOuter,
